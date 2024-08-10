@@ -1,4 +1,5 @@
 using Firebase.Storage;
+using ResourceLoaders;
 using RPG.UI;
 using Timers;
 using UnityEngine;
@@ -8,27 +9,31 @@ namespace RPG
     public class Bootstrapper : MonoBehaviour, ICoroutinePerformer
     {
         [SerializeField] private FollowingCamera _followingCamera;
-        [SerializeField] private CharacterMovement _characterMovement;
-        [SerializeField] private CharacterAnimations _animations;
-        [SerializeField] private Finish _finish;
         [SerializeField] private WinCanvas _winCanvas;
         [SerializeField] private TimeView _timeView;
 
         private readonly PlayerInput _input = new();
         private Level _level;
         
-        private void Start()
+        private void Awake()
         {
-            _level = new Level(_finish, _winCanvas, this, _timeView);
+            GameObject character = Instantiate(WalkingSimulatiorResourceLoader.Character);
+            var characterMovement = character.GetComponent<CharacterMovement>();
+            var characterAnimations = character.GetComponent<CharacterAnimations>();
             
-            _characterMovement.Init(_input);
-            _animations.Init(_characterMovement);
+            Finish finish = Instantiate(WalkingSimulatiorResourceLoader.Building).GetComponent<Finish>();
+
+            _level = new Level(finish, _winCanvas, this, _timeView);
             
-            _followingCamera.SetTarget(_characterMovement.transform);
+            characterMovement.Init(_input);
+            characterAnimations.Init(characterMovement);
+            
+            _followingCamera.SetTarget(characterMovement.transform);
             
             _level.Start();
 
             
+            characterMovement.Init(_input);
         }
 
         private void OnDestroy()
