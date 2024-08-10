@@ -1,3 +1,4 @@
+using Firebase.Storage;
 using RPG.UI;
 using Timers;
 using UnityEngine;
@@ -26,6 +27,8 @@ namespace RPG
             _followingCamera.SetTarget(_characterMovement.transform);
             
             _level.Start();
+
+            
         }
 
         private void OnDestroy()
