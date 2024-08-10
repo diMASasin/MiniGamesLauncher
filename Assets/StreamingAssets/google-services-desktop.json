@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "73703366923",
+    "project_id": "minigames-a639c",
+    "storage_bucket": "minigames-a639c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:73703366923:android:a04ddc0722d9684dd9020e",
+        "android_client_info": {
+          "package_name": "com.Technomaniacgames.MiniGamesLauncher"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBTEZh2aPyO8Em-zPYcfzFfs5k41fWJvXg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
