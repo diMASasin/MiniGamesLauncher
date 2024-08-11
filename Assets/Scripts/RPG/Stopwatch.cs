@@ -1,56 +1,45 @@
 using System;
 using System.Collections;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace Timers
 {
     public class Stopwatch
     {
-        private double _interval;
-        private Coroutine _coroutine;
-        private bool _paused;
-        private readonly ICoroutinePerformer _coroutinePerformer;
+        private CancellationTokenSource _tokenSource;
         
         public double TimePassed { get; private set; } = 0;
-        public bool Started { get; private set; }
         
         public event Action<double> Updated;
-
-        public Stopwatch(ICoroutinePerformer coroutinePerformer)
-        {
-            _coroutinePerformer = coroutinePerformer;
-        }
         
         public void Start()
         {
-            Stop();
             Reset();
-            _coroutine = _coroutinePerformer.StartCoroutine(StartStopwatch());
-            Started = true;
+
+            _tokenSource = new CancellationTokenSource();
+            StartStopwatch().Forget();
+            
             Updated?.Invoke(TimePassed);
         }
 
-        public void Stop()
-        {
-            if(_coroutine != null)
-                _coroutinePerformer.StopCoroutine(_coroutine);
-        }
+        public void Stop() => _tokenSource.Cancel();
 
-        private IEnumerator StartStopwatch()
+        private async UniTaskVoid StartStopwatch()
         {
-            while (true)
+            await UniTask.WaitWhile(() =>
             {
-                yield return null;
-                
                 TimePassed += Time.deltaTime;
                 Updated?.Invoke(TimePassed);
-            }
+                
+                return true;
+            }, cancellationToken: _tokenSource.Token);
         }
 
         private void Reset()
         {
-            TimePassed = _interval;
-            Started = false;
+            TimePassed = 0;
         }
     }
 }

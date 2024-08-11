@@ -1,17 +1,21 @@
+using Infrastructure;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class ExitToMainMenuButton : MonoBehaviour
+namespace ClickerSystem
 {
-    [SerializeField] private Button _button;
-
-    private void OnEnable() => _button.onClick.AddListener(OnExitButtonClicked);
-
-    private void OnDisable() => _button.onClick.RemoveListener(OnExitButtonClicked);
-
-    private void OnExitButtonClicked()
+    public class ExitToMainMenuButton : MonoBehaviour
     {
-        SceneManager.LoadScene(0);
+        [SerializeField] private Button _button;
+    
+        private readonly SceneLoader _sceneLoader = new();
+        private void OnEnable() => _button.onClick.AddListener(OnExitButtonClicked);
+
+        private void OnDisable() => _button.onClick.RemoveListener(OnExitButtonClicked);
+
+        private void OnExitButtonClicked()
+        {
+            _sceneLoader.Load("MainMenu");
+        }
     }
 }

@@ -1,17 +1,26 @@
 using TMPro;
 using UnityEngine;
 
-public class WalletView : MonoBehaviour
+namespace ClickerSystem
 {
-    [SerializeField] private TMP_Text _text;
-    [SerializeField] private Wallet _wallet;
-
-    private void OnEnable() => _wallet.PointsValueChanged += OnPointsValueChanged;
-
-    private void OnDisable() => _wallet.PointsValueChanged -= OnPointsValueChanged;
-
-    private void OnPointsValueChanged(int points)
+    public class WalletView : MonoBehaviour
     {
-        _text.text = points.ToString();
+        [SerializeField] private TMP_Text _text;
+    
+        private Wallet _wallet;
+
+        public void Init(Wallet wallet)
+        {
+            _wallet = wallet;
+        }
+    
+        private void OnEnable() => _wallet.PointsValueChanged += OnPointsValueChanged;
+
+        private void OnDisable() => _wallet.PointsValueChanged -= OnPointsValueChanged;
+
+        private void OnPointsValueChanged(int points)
+        {
+            _text.text = points.ToString();
+        }
     }
 }

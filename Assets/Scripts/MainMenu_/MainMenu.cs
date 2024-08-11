@@ -1,4 +1,8 @@
+using ClickerSystem;
+using Firebase.Storage;
+using Infrastructure;
 using ResourceLoaders;
+using RPG;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -11,16 +15,46 @@ namespace MainMenu_
         [SerializeField] private Button _playButton2;
         [SerializeField] private Button _loadButton;
         [SerializeField] private Button _loadButton2;
+        [SerializeField] private ResourceLoadProgressView _progressView;
+        [SerializeField] private ResourceLoadProgressView _progressView2;
 
-        private ClickerResourceLoader _clickerResourceLoader;
-        private WalkingSimulatiorResourceLoader _simulatiorResourceLoader;
-
-        public void Init(ClickerResourceLoader clickerResourceLoader, WalkingSimulatiorResourceLoader simulatiorResourceLoader)
-        {
-            _clickerResourceLoader = clickerResourceLoader;
-            _simulatiorResourceLoader = simulatiorResourceLoader;
-        }
+        private const string StorageUrl = "gs://minigames-a639c.appspot.com";
         
+        private FirebaseStorage _storage;
+        
+        private ResourceLoader _clickerResourceLoader;
+        private ResourceLoader _simulatiorResourceLoader;
+        private GameStaticData _clickerStaticData;
+        private GameStaticData _simulatorStaticData;
+        private ISceneLoader _sceneLoader;
+        private StorageReference _storageReference;
+
+        private void Start()
+        {
+            if (_clickerStaticData != null && _clickerStaticData.IsLoaded == true) 
+                _progressView.OnLoaded();
+            
+            if (_simulatorStaticData != null && _simulatorStaticData.IsLoaded == true) 
+                _progressView2.OnLoaded();
+
+        }
+
+        public void Init(ResourceLoader clickerResourceLoader, ResourceLoader simulatiorResourceLoader,
+            GameStaticData clickerStaticData, GameStaticData gameStaticData, ISceneLoader sceneLoader)
+        {
+            _sceneLoader = sceneLoader;
+            _simulatorStaticData = gameStaticData;
+            _clickerResourceLoader = clickerResourceLoader;
+            _clickerStaticData = clickerStaticData;
+            _simulatiorResourceLoader = simulatiorResourceLoader;
+
+            _storage = FirebaseStorage.DefaultInstance;
+            _storageReference = _storage.GetReferenceFromUrl(StorageUrl);
+            
+            _progressView.Init(_clickerResourceLoader);
+            _progressView2.Init(_simulatiorResourceLoader);
+        }
+
         private void OnEnable()
         {
             _playButton.onClick.AddListener(OnPlayButtonClicked);
@@ -39,22 +73,39 @@ namespace MainMenu_
 
         private void OnPlayButtonClicked()
         {
-            SceneManager.LoadScene(1);
+            Debug.Log($"{_clickerStaticData.IsLoaded}");
+
+            if (_clickerStaticData.IsLoaded == false) return;
+            
+            _sceneLoader.Load("Game1", () =>
+            {
+                var clicker = FindObjectOfType<ClickerBootstrapper>();
+                clicker.Init(_clickerStaticData);
+            });
         }
 
         private void OnPlayButtonClicked2()
         {
-            SceneManager.LoadScene(2);
+            Debug.Log($"{_simulatorStaticData.IsLoaded}");
+
+            if (_simulatorStaticData.IsLoaded)
+            {
+                _sceneLoader.Load("Game2", () =>
+                {
+                    var clicker = FindObjectOfType<SimulatorBootstrapper>();
+                    clicker.Init(_clickerStaticData);
+                });
+            }
         }
 
         private void OnLoadButtonClicked()
         {
-            _clickerResourceLoader.Load();
+            _clickerResourceLoader.Load(_clickerStaticData, _storageReference.Child("pizza"));
         }
 
         private void OnLoadButtonClicked2()
         {
-            _simulatiorResourceLoader.Load();
+            _simulatiorResourceLoader.Load(_simulatorStaticData, _storageReference.Child("walkingsimulator"));
         }
     }
 }

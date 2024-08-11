@@ -27,7 +27,9 @@ namespace Timers
         {
             double minutes = timeLeft / 60;
             double seconds = timeLeft % 60;
-            _text.text = $"{minutes:F0}:{seconds:00}";
+            double milliseconds = timeLeft * 1000 % 1000;
+            
+            _text.text = $"{minutes:F0}:{seconds:00}:{milliseconds:000}";
         }
     }
 }

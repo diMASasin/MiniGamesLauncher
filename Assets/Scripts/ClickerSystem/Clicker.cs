@@ -1,19 +1,27 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Clicker : MonoBehaviour
+namespace ClickerSystem
 {
-    [SerializeField] private Button _button;
-    [SerializeField] private Wallet _wallet;
-
-    private readonly int _addingValue = 1;
-
-    private void OnEnable() => _button.onClick.AddListener(OnButtonClicked);
-
-    private void OnDisable() => _button.onClick.RemoveListener(OnButtonClicked);
-
-    private void OnButtonClicked()
+    public class Clicker
     {
-        _wallet.Add(_addingValue);
+        private Wallet _wallet;
+        private Button _button;
+        private readonly int _addingValue = 1;
+
+        public void Init(Wallet wallet, Button button)
+        {
+            _wallet = wallet;
+            _button = button;
+            
+            _button.onClick.AddListener(OnButtonClicked);
+        }
+
+        private void OnDestroy() => _button.onClick.RemoveListener(OnButtonClicked);
+
+        private void OnButtonClicked()
+        {
+            _wallet.Add(_addingValue);
+        }
     }
 }

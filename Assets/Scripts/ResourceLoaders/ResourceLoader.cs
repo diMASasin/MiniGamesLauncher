@@ -9,17 +9,17 @@ using UnityEngine.Networking;
 
 namespace ResourceLoaders
 {
-    public class WalkingSimulatiorResourceLoader : IClickerResourceLoader
+    public class ResourceLoader : IResourceLoader
     {
-        public static GameObject Character;
-        public static GameObject Building;
+        private GameStaticData _staticData;
+        
+        public event Action<float> ProgressChanged;
+        public event Action<UnityWebRequest.Result> StatusChanged;
 
-        public void Load()
+        public void Load(GameStaticData staticData, StorageReference fileReference)
         {
-            FirebaseStorage storage = FirebaseStorage.DefaultInstance;
-            StorageReference storageReference = storage.GetReferenceFromUrl("gs://minigames-a639c.appspot.com");
-            StorageReference fileReference = storageReference.Child("walkingsimulator");
-
+            _staticData = staticData;
+            
             fileReference.GetDownloadUrlAsync().ContinueWithOnMainThread(NewMethod);
         }
 
@@ -29,8 +29,10 @@ namespace ResourceLoaders
 
             UnityWebRequest request = await GetModels(task);
 
+            StatusChanged?.Invoke(request.result);
+            
             Debug.Log(request.result == UnityWebRequest.Result.Success
-                ? $"Recieved "
+                ? $"Assets recieved successfully"
                 : $"Error: {request.error}");
 
             request.Dispose();
@@ -40,11 +42,18 @@ namespace ResourceLoaders
         {
             Debug.Log("Download URL: " + task.Result);
                  
-            UnityWebRequest request = await UnityWebRequestAssetBundle.GetAssetBundle(task.Result, 0).SendWebRequest();
+            StatusChanged?.Invoke(UnityWebRequest.Result.InProgress);
+            UnityWebRequest request = UnityWebRequestAssetBundle.GetAssetBundle(task.Result, 0).SendWebRequest().webRequest;
+            
+            await UniTask.WaitUntil(() =>
+            {
+                ProgressChanged?.Invoke(request.downloadProgress);
+                return request.isDone == true;
+            });
             
             AssetBundle bundle = DownloadHandlerAssetBundle.GetContent(request);
-            Character = bundle.LoadAsset<GameObject>("HumanMale_Character_FREE");
-            Building = bundle.LoadAsset<GameObject>("rpgpp_lt_building_04");
+            
+            _staticData.SetData(bundle);
 
             return request;
         }

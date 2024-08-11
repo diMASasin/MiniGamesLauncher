@@ -1,7 +1,14 @@
+using System;
+using Firebase.Storage;
+using UnityEngine.Networking;
+
 namespace ResourceLoaders
 {
-    public interface IClickerResourceLoader
+    public interface IResourceLoader
     {
-        void Load();
+        public event Action<float> ProgressChanged;
+        public event Action<UnityWebRequest.Result> StatusChanged;
+
+        void Load(GameStaticData staticData, StorageReference fileReference);
     }
 }

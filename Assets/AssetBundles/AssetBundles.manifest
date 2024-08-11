@@ -1,7 +1,10 @@
 ManifestFileVersion: 0
-CRC: 721726829
+CRC: 3450814249
 AssetBundleManifest:
   AssetBundleInfos:
     Info_0:
       Name: walkingsimulator
+      Dependencies: {}
+    Info_1:
+      Name: pizza
       Dependencies: {}

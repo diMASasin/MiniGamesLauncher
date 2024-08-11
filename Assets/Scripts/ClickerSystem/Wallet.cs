@@ -1,15 +1,17 @@
 using System;
-using UnityEngine;
 
-public class Wallet : MonoBehaviour
+namespace ClickerSystem
 {
-    private int _points;
-
-    public event Action<int> PointsValueChanged;
-    
-    public void Add(int value)
+    public class Wallet
     {
-        _points += value;
-        PointsValueChanged?.Invoke(_points);
+        private int _points;
+
+        public event Action<int> PointsValueChanged;
+    
+        public void Add(int value)
+        {
+            _points += value;
+            PointsValueChanged?.Invoke(_points);
+        }
     }
 }

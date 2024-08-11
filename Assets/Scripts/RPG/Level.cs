@@ -9,14 +9,15 @@ namespace RPG
     {
         private readonly Finish _finish;
         private readonly WinCanvas _winCanvas;
-        private readonly Stopwatch _stopwatch;
+        private readonly Stopwatch _stopwatch = new();
+        private readonly Canvas _gameplayCanvas;
 
-        public Level(Finish finish, WinCanvas winCanvas, ICoroutinePerformer coroutinePerformer, TimeView timeView)
+        public Level(Finish finish, WinCanvas winCanvas, Canvas gameplayCanvas, TimeView timeView)
         {
+            _gameplayCanvas = gameplayCanvas;
             _winCanvas = winCanvas;
             _finish = finish;
             
-            _stopwatch = new Stopwatch(coroutinePerformer);
             timeView.Init(_stopwatch);
             
             _finish.Finished += OnFinished;
@@ -35,6 +36,7 @@ namespace RPG
         private void OnFinished()
         {
             _stopwatch.Stop();
+            _gameplayCanvas.gameObject.SetActive(false);
             _winCanvas.Show(_stopwatch.TimePassed);
         }
     }
