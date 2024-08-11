@@ -1,4 +1,4 @@
-using Firebase.Storage;
+using System.Collections.Generic;
 using ResourceLoaders;
 using RPG.UI;
 using Timers;
@@ -13,6 +13,10 @@ namespace RPG
         [SerializeField] private Canvas _gameplayCanvas;
         [SerializeField] private TimeView _timeView;
 
+        public const string SimulatorBundleName = "walkingsimulator";
+        public const string CharacterObjectName = "HumanMale_Character_FREE";
+        public const string BuildingObjectName = "rpgpp_lt_building_04";
+        
         private readonly PlayerInput _input = new();
         private Level _level;
         private CharacterMovement _characterMovement;
@@ -37,12 +41,16 @@ namespace RPG
 
         private void LoadAssets(GameStaticData staticData)
         {
-            var characterResource = staticData.AssetBundle.LoadAsset<GameObject>("HumanMale_Character_FREE");
+            if (staticData.TryGetAssetBundle(SimulatorBundleName, out var assetBundle) == false)
+                throw new KeyNotFoundException(nameof(SimulatorBundleName));
+
+            var characterResource = assetBundle.LoadAsset<GameObject>(CharacterObjectName);
+            var finishResource = assetBundle.LoadAsset<GameObject>(BuildingObjectName);
+            
             GameObject character = Instantiate(characterResource);
             _characterMovement = character.GetComponent<CharacterMovement>();
             _characterAnimations = character.GetComponent<CharacterAnimations>();
 
-            GameObject finishResource = staticData.AssetBundle.LoadAsset<GameObject>("rpgpp_lt_building_04");
             _finish = Instantiate(finishResource).GetComponent<Finish>();
         }
 

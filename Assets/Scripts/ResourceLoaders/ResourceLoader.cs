@@ -12,13 +12,17 @@ namespace ResourceLoaders
     public class ResourceLoader : IResourceLoader
     {
         private GameStaticData _staticData;
-        
+        private string _fileName;
+
         public event Action<float> ProgressChanged;
         public event Action<UnityWebRequest.Result> StatusChanged;
 
-        public void Load(GameStaticData staticData, StorageReference fileReference)
+        public void Load(GameStaticData staticData, StorageReference storageReference, string fileName)
         {
+            _fileName = fileName;
             _staticData = staticData;
+
+            var fileReference = storageReference.Child(fileName);
             
             fileReference.GetDownloadUrlAsync().ContinueWithOnMainThread(NewMethod);
         }
@@ -52,8 +56,7 @@ namespace ResourceLoaders
             });
             
             AssetBundle bundle = DownloadHandlerAssetBundle.GetContent(request);
-            
-            _staticData.SetData(bundle);
+            _staticData.AddAssetBundle(_fileName, bundle);
 
             return request;
         }

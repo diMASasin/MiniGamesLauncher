@@ -9,6 +9,6 @@ namespace ResourceLoaders
         public event Action<float> ProgressChanged;
         public event Action<UnityWebRequest.Result> StatusChanged;
 
-        void Load(GameStaticData staticData, StorageReference fileReference);
+        void Load(GameStaticData staticData, StorageReference storageReference, string fileName);
     }
 }

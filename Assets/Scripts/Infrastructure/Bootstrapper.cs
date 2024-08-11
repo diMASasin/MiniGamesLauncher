@@ -22,7 +22,7 @@ namespace Infrastructure
         
             DontDestroyOnLoad(this);
         
-            _mainMenu.Init(_clickerResourceLoader, _simulatiorResourceLoader, _clickerStaticData, _gameStaticData, _sceneLoader);
+            _mainMenu.Init(_clickerResourceLoader, _simulatiorResourceLoader, _clickerStaticData, _sceneLoader);
         
         }
     }

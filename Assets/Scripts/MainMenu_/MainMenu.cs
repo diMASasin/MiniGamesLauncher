@@ -6,6 +6,8 @@ using RPG;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using static ClickerSystem.ClickerBootstrapper;
+using static RPG.SimulatorBootstrapper;
 
 namespace MainMenu_
 {
@@ -24,28 +26,26 @@ namespace MainMenu_
         
         private ResourceLoader _clickerResourceLoader;
         private ResourceLoader _simulatiorResourceLoader;
-        private GameStaticData _clickerStaticData;
-        private GameStaticData _simulatorStaticData;
+        private GameStaticData _gameStaticData;
         private ISceneLoader _sceneLoader;
         private StorageReference _storageReference;
 
         private void Start()
         {
-            if (_clickerStaticData != null && _clickerStaticData.IsLoaded == true) 
+            if (_gameStaticData != null && _gameStaticData.TryGetAssetBundle(ClickerBundleName, out _))
                 _progressView.OnLoaded();
-            
-            if (_simulatorStaticData != null && _simulatorStaticData.IsLoaded == true) 
+
+            if (_gameStaticData != null && _gameStaticData.TryGetAssetBundle(SimulatorBundleName, out _)) 
                 _progressView2.OnLoaded();
 
         }
 
         public void Init(ResourceLoader clickerResourceLoader, ResourceLoader simulatiorResourceLoader,
-            GameStaticData clickerStaticData, GameStaticData gameStaticData, ISceneLoader sceneLoader)
+            GameStaticData clickerStaticData, ISceneLoader sceneLoader)
         {
             _sceneLoader = sceneLoader;
-            _simulatorStaticData = gameStaticData;
             _clickerResourceLoader = clickerResourceLoader;
-            _clickerStaticData = clickerStaticData;
+            _gameStaticData = clickerStaticData;
             _simulatiorResourceLoader = simulatiorResourceLoader;
 
             _storage = FirebaseStorage.DefaultInstance;
@@ -73,39 +73,44 @@ namespace MainMenu_
 
         private void OnPlayButtonClicked()
         {
-            Debug.Log($"{_clickerStaticData.IsLoaded}");
+            bool clickerDataLoaded = _gameStaticData.TryGetAssetBundle(ClickerBundleName, out _);
+            
+            Debug.Log($"{clickerDataLoaded}");
 
-            if (_clickerStaticData.IsLoaded == false) return;
+            if (clickerDataLoaded == false) return;
             
             _sceneLoader.Load("Game1", () =>
             {
                 var clicker = FindObjectOfType<ClickerBootstrapper>();
-                clicker.Init(_clickerStaticData);
+                clicker.Init(_gameStaticData);
             });
         }
 
         private void OnPlayButtonClicked2()
         {
-            Debug.Log($"{_simulatorStaticData.IsLoaded}");
+            bool simulatorDataLoaded = _gameStaticData.TryGetAssetBundle(SimulatorBundleName, out _);
+            
+            Debug.Log($"{simulatorDataLoaded}");
 
-            if (_simulatorStaticData.IsLoaded)
+            if (simulatorDataLoaded == false) return;
+            
+            _sceneLoader.Load("Game2", () =>
             {
-                _sceneLoader.Load("Game2", () =>
-                {
-                    var clicker = FindObjectOfType<SimulatorBootstrapper>();
-                    clicker.Init(_clickerStaticData);
-                });
-            }
+                var clicker = FindObjectOfType<SimulatorBootstrapper>();
+                clicker.Init(_gameStaticData);
+            });
         }
 
         private void OnLoadButtonClicked()
         {
-            _clickerResourceLoader.Load(_clickerStaticData, _storageReference.Child("pizza"));
+            string fileName = "pizza";
+            _clickerResourceLoader.Load(_gameStaticData, _storageReference, fileName);
         }
 
         private void OnLoadButtonClicked2()
         {
-            _simulatiorResourceLoader.Load(_simulatorStaticData, _storageReference.Child("walkingsimulator"));
+            string fileName = "walkingsimulator";
+            _simulatiorResourceLoader.Load(_gameStaticData, _storageReference, fileName);
         }
     }
 }
