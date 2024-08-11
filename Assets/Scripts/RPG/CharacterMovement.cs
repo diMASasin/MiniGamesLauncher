@@ -19,24 +19,28 @@ namespace RPG
         {
             _input = input;
         }
-        
+
         private void Update()
         {
             _direction.x = _input.GetHorizontalAxis();
             _direction.z = _input.GetVerticalAxis();
-
+            
             _direction.Normalize();
-            
+
             DirectionChanged?.Invoke(_direction);
-            
-            if (_direction != Vector3.zero)
+            Debug.Log($"{_direction}");
+
+            Vector3 lookDirection = new Vector3(_direction.x, 0, _direction.z);
+
+            if (lookDirection != Vector3.zero)
             {
-                Quaternion targetRotation = Quaternion.LookRotation(_direction);
+                Quaternion targetRotation = Quaternion.LookRotation(lookDirection);
                 transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * _rotationSpeed);
             }
 
             _velocity = _direction * (_speed * Time.deltaTime);
-            
+            _velocity.y += _controller.isGrounded ? -1 : Physics.gravity.y * Time.deltaTime;
+
             _controller.Move(_velocity);
         }
     }

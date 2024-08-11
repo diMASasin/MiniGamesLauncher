@@ -103,13 +103,13 @@ namespace MainMenu_
 
         private void OnLoadButtonClicked()
         {
-            string fileName = "pizza";
+            string fileName = ClickerBundleName;
             _clickerResourceLoader.Load(_gameStaticData, _storageReference, fileName);
         }
 
         private void OnLoadButtonClicked2()
         {
-            string fileName = "walkingsimulator";
+            string fileName = SimulatorBundleName;
             _simulatiorResourceLoader.Load(_gameStaticData, _storageReference, fileName);
         }
     }

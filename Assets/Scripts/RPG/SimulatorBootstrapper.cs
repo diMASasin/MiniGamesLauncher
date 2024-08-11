@@ -12,16 +12,15 @@ namespace RPG
         [SerializeField] private WinCanvas _winCanvas;
         [SerializeField] private Canvas _gameplayCanvas;
         [SerializeField] private TimeView _timeView;
+        [SerializeField] private CharacterMovement _characterMovement;
+        [SerializeField] private Finish _finish;
 
         public const string SimulatorBundleName = "walkingsimulator";
-        public const string CharacterObjectName = "HumanMale_Character_FREE";
-        public const string BuildingObjectName = "rpgpp_lt_building_04";
+        public const string CharacterObjectName = "CharacterModel";
+        public const string BuildingObjectName = "BuildingModel";
         
         private readonly PlayerInput _input = new();
         private Level _level;
-        private CharacterMovement _characterMovement;
-        private CharacterAnimations _characterAnimations;
-        private Finish _finish;
 
         public void Init(GameStaticData staticData)
         {
@@ -30,7 +29,6 @@ namespace RPG
             _level = new Level(_finish, _winCanvas, _gameplayCanvas, _timeView);
             
             _characterMovement.Init(_input);
-            _characterAnimations.Init(_characterMovement);
             
             _followingCamera.SetTarget(_characterMovement.transform);
             
@@ -46,12 +44,12 @@ namespace RPG
 
             var characterResource = assetBundle.LoadAsset<GameObject>(CharacterObjectName);
             var finishResource = assetBundle.LoadAsset<GameObject>(BuildingObjectName);
-            
-            GameObject character = Instantiate(characterResource);
-            _characterMovement = character.GetComponent<CharacterMovement>();
-            _characterAnimations = character.GetComponent<CharacterAnimations>();
 
-            _finish = Instantiate(finishResource).GetComponent<Finish>();
+            Instantiate(characterResource, _characterMovement.transform)
+                .TryGetComponent(out CharacterAnimations animations);
+            animations.Init(_characterMovement);
+            
+            Instantiate(finishResource, _finish.transform);
         }
 
         private void OnDestroy()
