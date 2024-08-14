@@ -1083,6 +1083,8 @@ MonoBehaviour:
   _playButton2: {fileID: 7441773472519452820}
   _loadButton: {fileID: 4313541763010703381}
   _loadButton2: {fileID: 4256071163422059262}
+  _unloadButton: {fileID: 5010122108312395500}
+  _unloadButton2: {fileID: 2681941858236124440}
   _progressView: {fileID: 7186705832993401948}
   _progressView2: {fileID: 1713370803895173369}
 --- !u!1 &4101511702716893227

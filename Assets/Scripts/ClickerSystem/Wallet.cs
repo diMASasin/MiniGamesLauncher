@@ -1,17 +1,19 @@
 using System;
+using UnityEngine;
 
 namespace ClickerSystem
 {
+    [Serializable]
     public class Wallet
     {
-        private int _points;
-
+        public int Points { get; set; }
+        
         public event Action<int> PointsValueChanged;
     
         public void Add(int value)
         {
-            _points += value;
-            PointsValueChanged?.Invoke(_points);
+            Points += value;
+            PointsValueChanged?.Invoke(Points);
         }
     }
 }

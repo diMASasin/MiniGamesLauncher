@@ -7,10 +7,10 @@ namespace RPG
         [field: SerializeField] public bool MoveSmoothly { get; private set; }
         [field: SerializeField] public float Speed { get; private set; } = 10;
         [field: SerializeField] public Vector3 Offset { get; private set; }
+        [field: SerializeField] public Transform FollowingFor { get; private set; }
 
         private Vector3 _newPosition;
         public Vector3 MoveTo { get; private set; }
-        public Transform FollowingFor { get; private set; }
         public bool FreezeZPosition { get; private set; }
 
         public Vector3 CurrentPosition

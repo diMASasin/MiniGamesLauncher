@@ -8,9 +8,11 @@ namespace Timers
         [SerializeField] private TMP_Text _text;
         
         private Stopwatch _stopwatch;
+        private ITimeFormatter _timeFormatter;
 
-        public void Init(Stopwatch stopwatch)
+        public void Init(Stopwatch stopwatch, ITimeFormatter timeFormatter)
         {
+            _timeFormatter = timeFormatter;
             _stopwatch = stopwatch;
 
             _stopwatch.Updated += OnUpdated;
@@ -23,13 +25,6 @@ namespace Timers
 
         private void OnUpdated(double timeLeft) => ShowTime(timeLeft);
 
-        public void ShowTime(double timeLeft)
-        {
-            double minutes = timeLeft / 60;
-            double seconds = timeLeft % 60;
-            double milliseconds = timeLeft * 1000 % 1000;
-            
-            _text.text = $"{minutes:F0}:{seconds:00}:{milliseconds:000}";
-        }
+        public void ShowTime(double timeLeft) => _text.text = _timeFormatter.Format(timeLeft);
     }
 }

@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using ClickerSystem;
+using MainMenu_;
 using ResourceLoaders;
 using RPG.UI;
 using Timers;
@@ -6,55 +8,71 @@ using UnityEngine;
 
 namespace RPG
 {
-    public class SimulatorBootstrapper : MonoBehaviour
+    public class SimulatorBootstrapper : GameBootstrapper
     {
         [SerializeField] private FollowingCamera _followingCamera;
         [SerializeField] private WinCanvas _winCanvas;
         [SerializeField] private Canvas _gameplayCanvas;
         [SerializeField] private TimeView _timeView;
         [SerializeField] private CharacterMovement _characterMovement;
+        [SerializeField] private CharacterAnimations _characterAnimations;
         [SerializeField] private Finish _finish;
-
-        public const string SimulatorBundleName = "walkingsimulator";
-        public const string CharacterObjectName = "CharacterModel";
-        public const string BuildingObjectName = "BuildingModel";
+        [SerializeField] private string _playerName;
+        [field: SerializeField] public List<AssetBandleObject> BundleObjectsInfo { get; private set; }
         
         private readonly PlayerInput _input = new();
+        private Leaderboard _leaderboard;
         private Level _level;
+        private SaveSystem _saveSystem;
 
-        public void Init(GameStaticData staticData)
+        public override void Init(GameStaticData staticData, GameConfig config)
         {
-            LoadAssets(staticData);
+            LoadAssets(staticData, config);
+            LoadSaves(config);
+            InitializeObjects();
 
-            _level = new Level(_finish, _winCanvas, _gameplayCanvas, _timeView);
-            
-            _characterMovement.Init(_input);
-            
-            _followingCamera.SetTarget(_characterMovement.transform);
-            
             _level.Start();
-            
-            _characterMovement.Init(_input);
-        }
-
-        private void LoadAssets(GameStaticData staticData)
-        {
-            if (staticData.TryGetAssetBundle(SimulatorBundleName, out var assetBundle) == false)
-                throw new KeyNotFoundException(nameof(SimulatorBundleName));
-
-            var characterResource = assetBundle.LoadAsset<GameObject>(CharacterObjectName);
-            var finishResource = assetBundle.LoadAsset<GameObject>(BuildingObjectName);
-
-            Instantiate(characterResource, _characterMovement.transform)
-                .TryGetComponent(out CharacterAnimations animations);
-            animations.Init(_characterMovement);
-            
-            Instantiate(finishResource, _finish.transform);
         }
 
         private void OnDestroy()
         {
-            _level.Dispose();
+            if (_level != null) _level.Dispose();
+        }
+
+        private void LoadAssets(GameStaticData staticData, GameConfig config)
+        {
+            if (staticData.TryGetAssetBundle(config.BundleName, out var assetBundle) == false)
+                throw new KeyNotFoundException(nameof(config.BundleName));
+            
+            foreach (var bandleObject in BundleObjectsInfo)
+            {
+                var asset = assetBundle.LoadAsset<GameObject>(bandleObject.Name);
+                GameObject assetObject = Instantiate(asset, bandleObject.Parent);
+                assetObject.name = assetObject.name.Replace("(Clone)", "");
+            }
+        }
+
+        private void LoadSaves(GameConfig config)
+        {
+            _saveSystem = new SaveSystem(config.ProgressSavePath);
+
+            if (_saveSystem.TryLoad(config.ProgressSavePath, out _leaderboard) == false)
+                _leaderboard = new Leaderboard();
+        }
+
+        private void InitializeObjects()
+        {
+            _level = new Level(_finish, _winCanvas, _gameplayCanvas, _timeView, _leaderboard, _playerName);
+
+            _characterMovement.Init(_input);
+            _characterMovement.gameObject.SetActive(true);
+
+            _followingCamera.SetTarget(_characterMovement.transform);
+        }
+
+        private void OnApplicationQuit()
+        {
+            if (_saveSystem != null) _saveSystem.Save(_leaderboard);
         }
     }
 }

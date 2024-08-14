@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -20,12 +21,14 @@ namespace ResourceLoaders
             
             _resourceLoader.ProgressChanged += OnProgressChanged;
             _resourceLoader.StatusChanged += OnStatusChanged;
+            _resourceLoader.Unloaded += OnUnloaded;
         }
 
         private void OnDestroy()
         {
             _resourceLoader.ProgressChanged -= OnProgressChanged;
             _resourceLoader.StatusChanged -= OnStatusChanged;
+            _resourceLoader.Unloaded -= OnUnloaded;
         }
 
         private void OnProgressChanged(float progress)
@@ -42,6 +45,12 @@ namespace ResourceLoaders
         {
             OnProgressChanged(_maxProgressValue);
             OnStatusChanged(UnityWebRequest.Result.Success);
+        }
+
+        private void OnUnloaded()
+        {
+            OnProgressChanged(_slider.minValue);
+            _statusText.text = string.Empty;
         }
     }
 }

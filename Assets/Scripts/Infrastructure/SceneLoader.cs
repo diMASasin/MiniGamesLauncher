@@ -9,14 +9,13 @@ namespace Infrastructure
     {
         public const string BattleScenePrefix = "Map";
         
-        public readonly string MainMenu = nameof(MainMenu);
-        public readonly string Map3 = nameof(Map3);
+        public const string MainMenu = nameof(MainMenu);
+        public const string Game1 = nameof(Game1);
+        public const string Game2 = nameof(Game2);
     }
 
     public class SceneLoader : ISceneLoader
     {
-        public SceneNames SceneNames { get; } = new();
-
         public event Action<float> ProgressChanged;
 
         public void Load(string name, Action onLoaded = null) => 
@@ -32,7 +31,6 @@ namespace Infrastructure
             await UniTask.WaitUntil(() =>
             {
                 ProgressChanged?.Invoke(waitNextScene.progress);
-                Debug.Log($"waitNextScene.progress: {waitNextScene.progress}");
                 return waitNextScene.isDone == true;
             });
         

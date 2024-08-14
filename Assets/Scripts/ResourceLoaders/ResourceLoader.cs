@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using Firebase.Extensions;
@@ -16,6 +17,7 @@ namespace ResourceLoaders
 
         public event Action<float> ProgressChanged;
         public event Action<UnityWebRequest.Result> StatusChanged;
+        public event Action Unloaded;
 
         public void Load(GameStaticData staticData, StorageReference storageReference, string fileName)
         {
@@ -23,18 +25,46 @@ namespace ResourceLoaders
             _staticData = staticData;
 
             var fileReference = storageReference.Child(fileName);
-            
-            fileReference.GetDownloadUrlAsync().ContinueWithOnMainThread(NewMethod);
+
+            fileReference.GetDownloadUrlAsync().ContinueWithOnMainThread(RequestLoad);
         }
 
-        private async void NewMethod(Task<Uri> task)
+        public void Unload(string name)
+        {
+            if (_staticData.TryGetAssetBundle(name, out var assetBundle) == false)
+                throw new KeyNotFoundException(nameof(name));
+
+            assetBundle.Unload(true);
+            Unloaded?.Invoke();
+        }
+
+        public void Upload(StorageReference storageReference, string fileName)
+        {
+            StorageReference fileReference = storageReference.Child(fileName);
+
+            fileReference.PutFileAsync(fileName).ContinueWith(task =>
+            {
+                if (!task.IsFaulted && !task.IsCanceled)
+                {
+                    Debug.Log(task.Exception.ToString());
+                    return;
+                }
+
+                StorageMetadata metadata = task.Result;
+                string md5Hash = metadata.Md5Hash;
+                Debug.Log("Finished uploading...");
+                Debug.Log("md5 hash = " + md5Hash);
+            });
+        }
+
+        private async void RequestLoad(Task<Uri> task)
         {
             if (task.IsFaulted || task.IsCanceled) return;
 
-            UnityWebRequest request = await GetModels(task);
+            UnityWebRequest request = await LoadBundles(task);
 
             StatusChanged?.Invoke(request.result);
-            
+
             Debug.Log(request.result == UnityWebRequest.Result.Success
                 ? $"Assets recieved successfully"
                 : $"Error: {request.error}");
@@ -42,19 +72,20 @@ namespace ResourceLoaders
             request.Dispose();
         }
 
-        private async UniTask<UnityWebRequest> GetModels(Task<Uri> task)
+        private async UniTask<UnityWebRequest> LoadBundles(Task<Uri> task)
         {
             Debug.Log("Download URL: " + task.Result);
-                 
+
             StatusChanged?.Invoke(UnityWebRequest.Result.InProgress);
-            UnityWebRequest request = UnityWebRequestAssetBundle.GetAssetBundle(task.Result, 0).SendWebRequest().webRequest;
-            
+            UnityWebRequest request =
+                UnityWebRequestAssetBundle.GetAssetBundle(task.Result, 0).SendWebRequest().webRequest;
+
             await UniTask.WaitUntil(() =>
             {
                 ProgressChanged?.Invoke(request.downloadProgress);
                 return request.isDone == true;
             });
-            
+
             AssetBundle bundle = DownloadHandlerAssetBundle.GetContent(request);
             _staticData.AddAssetBundle(_fileName, bundle);
 

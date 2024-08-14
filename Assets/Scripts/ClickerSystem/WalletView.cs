@@ -13,12 +13,14 @@ namespace ClickerSystem
         {
             _wallet = wallet;
 
+            OnPointsValueChanged(wallet.Points);
+            
             _wallet.PointsValueChanged += OnPointsValueChanged;
         }
 
         private void OnDestroy()
         {
-            _wallet.PointsValueChanged -= OnPointsValueChanged;
+            if (_wallet != null) _wallet.PointsValueChanged -= OnPointsValueChanged;
         }
 
         private void OnPointsValueChanged(int points) => _text.text = points.ToString();

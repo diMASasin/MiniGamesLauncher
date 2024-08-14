@@ -1,15 +1,15 @@
 ManifestFileVersion: 0
-CRC: 1808788630
+CRC: 2063487662
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 8938054acaba0580ee663ba5f92d2e12
+    Hash: 07a7078ccc19c25f30df2a6047046e65
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 46aded4d093c66f0d607f1dd67c5f1a1
+    Hash: 0a897b760ea3d3eb7bc5a0301cc01ed5
   IncrementalBuildHash:
     serializedVersion: 2
-    Hash: 8938054acaba0580ee663ba5f92d2e12
+    Hash: 07a7078ccc19c25f30df2a6047046e65
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -28,22 +28,10 @@ ClassTypes:
   Script: {instanceID: 0}
 - Class: 48
   Script: {instanceID: 0}
-- Class: 74
-  Script: {instanceID: 0}
-- Class: 90
-  Script: {instanceID: 0}
-- Class: 91
-  Script: {instanceID: 0}
-- Class: 95
-  Script: {instanceID: 0}
-- Class: 114
-  Script: {fileID: 11500000, guid: a9f7c85c813148279cb2080c850830b3, type: 3}
-- Class: 115
-  Script: {instanceID: 0}
 - Class: 137
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
 - Assets/Prefabs/BuildingModel.prefab
-- Assets/Prefabs/CharacterModel.prefab
+- Assets/Prefabs/Armature.prefab
 Dependencies: []

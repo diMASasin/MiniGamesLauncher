@@ -22,13 +22,14 @@ namespace RPG
 
         private void Update()
         {
+            if(_input == null) return;
+            
             _direction.x = _input.GetHorizontalAxis();
             _direction.z = _input.GetVerticalAxis();
             
             _direction.Normalize();
 
             DirectionChanged?.Invoke(_direction);
-            Debug.Log($"{_direction}");
 
             Vector3 lookDirection = new Vector3(_direction.x, 0, _direction.z);
 

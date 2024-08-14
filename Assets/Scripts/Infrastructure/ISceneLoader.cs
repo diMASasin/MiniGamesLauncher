@@ -4,8 +4,6 @@ namespace Infrastructure
 {
     public interface ISceneLoader
     {
-        public SceneNames SceneNames { get; }
-
         public event Action<float> ProgressChanged;
         
         void Load(string name, Action onLoaded = null);
