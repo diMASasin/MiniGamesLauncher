@@ -2540,6 +2540,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 5605657368532259139, guid: 7bded30ec28161045845dac10f3a2275, type: 3}
   m_PrefabInstance: {fileID: 200744838}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &200744840 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6295484421777286204, guid: 7bded30ec28161045845dac10f3a2275, type: 3}
+  m_PrefabInstance: {fileID: 200744838}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3f7f12d6c8147ad9b5fc623440216cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &212800707
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10732,6 +10743,7 @@ MonoBehaviour:
   _characterAnimations: {fileID: 385282435}
   _finish: {fileID: 645088180}
   _playerName: Player 1
+  _exitToMainMenuButton: {fileID: 200744840}
   <BundleObjectsInfo>k__BackingField:
   - <Name>k__BackingField: BuildingModel
     <Parent>k__BackingField: {fileID: 645088181}

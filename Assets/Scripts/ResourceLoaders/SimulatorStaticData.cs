@@ -5,13 +5,13 @@ namespace ResourceLoaders
 {
     public class GameStaticData
     {
-        private static readonly Dictionary<string, AssetBundle> _assetBundles = new();
+        private static readonly Dictionary<string, AssetBundle> AssetBundles = new();
 
-        private static AssetBundle _assetBundle;
-
-        public void AddAssetBundle(string name, AssetBundle assetBundle) => _assetBundles[name] = assetBundle;
+        public void AddAssetBundle(string name, AssetBundle assetBundle) => AssetBundles[name] = assetBundle;
 
         public bool TryGetAssetBundle(string name, out AssetBundle assetBundle) => 
-            _assetBundles.TryGetValue(name, out assetBundle);
+            AssetBundles.TryGetValue(name, out assetBundle);
+
+        public void RemoveAssetBundle(string key) => AssetBundles.Remove(key, out _);
     }
 }

@@ -1,95 +1,86 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Net.NetworkInformation;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using Firebase.Extensions;
 using Firebase.Storage;
-using RPG;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Networking;
 
 namespace ResourceLoaders
 {
-    public class ResourceLoader : IResourceLoader
+    public class ResourceLoader : ILoadMethodActions
     {
-        private GameStaticData _staticData;
-        private string _fileName;
+        private readonly StorageReference _storageReference;
+        private readonly GameStaticData _staticData = new();
 
-        public event Action<float> ProgressChanged;
+        private string _fileName;
+        private ILoadMethod _loadMethod;
+
         public event Action<UnityWebRequest.Result> StatusChanged;
+        public event Action<float> ProgressChanged;
         public event Action Unloaded;
 
-        public void Load(GameStaticData staticData, StorageReference storageReference, string fileName)
+        public ResourceLoader(StorageReference storageReference, ILoadMethod loadMethod)
         {
-            _fileName = fileName;
-            _staticData = staticData;
-
-            var fileReference = storageReference.Child(fileName);
-
-            fileReference.GetDownloadUrlAsync().ContinueWithOnMainThread(RequestLoad);
+            _loadMethod = loadMethod;
+            _storageReference = storageReference;
         }
 
-        public void Unload(string name)
+        public async UniTask Load(string fileName)
         {
-            if (_staticData.TryGetAssetBundle(name, out var assetBundle) == false)
-                throw new KeyNotFoundException(nameof(name));
+            _fileName = fileName;
+            
+            if(Application.internetReachability == NetworkReachability.NotReachable)
+                throw new InvalidConnectionException("Network not reachable");
 
-            assetBundle.Unload(true);
+            StorageReference fileReference = _storageReference.Child(fileName);
+            
+            await fileReference.GetDownloadUrlAsync().ContinueWithOnMainThread(async task =>
+            {
+                if (task.IsFaulted || task.IsCanceled)
+                    throw new TaskCanceledException("Task cancelled");
+
+                UnityWebRequest webRequest = _loadMethod.GetWebRequest(task, _fileName);
+            
+                StatusChanged?.Invoke(UnityWebRequest.Result.InProgress);
+
+                await UniTask.WaitUntil(() =>
+                {
+                    ProgressChanged?.Invoke(webRequest.downloadProgress);
+                    return webRequest.isDone == true;
+                });
+            
+                Debug.Log("Download URL: " + task.Result);
+            
+                StatusChanged?.Invoke(UnityWebRequest.Result.Success);
+                
+                _loadMethod.OnResourceLoaded(webRequest, _fileName);
+            });
+        }
+
+        public void Unload(string fileName)
+        {
+            _loadMethod.Unload(fileName);
+            
             Unloaded?.Invoke();
         }
 
-        public void Upload(StorageReference storageReference, string fileName)
+        public async UniTask Upload(string fileName)
         {
-            StorageReference fileReference = storageReference.Child(fileName);
+            if (Application.internetReachability == NetworkReachability.NotReachable)
+                throw new InvalidConnectionException("Network not reachable");
 
-            fileReference.PutFileAsync(fileName).ContinueWith(task =>
+            StorageReference fileReference = _storageReference.Child(fileName);
+
+            await fileReference.PutFileAsync(fileName).ContinueWith(task =>
             {
-                if (!task.IsFaulted && !task.IsCanceled)
-                {
-                    Debug.Log(task.Exception.ToString());
-                    return;
-                }
-
-                StorageMetadata metadata = task.Result;
-                string md5Hash = metadata.Md5Hash;
-                Debug.Log("Finished uploading...");
-                Debug.Log("md5 hash = " + md5Hash);
+                Debug.Log($"Finished uploading... file name = {fileName}");
             });
         }
 
-        private async void RequestLoad(Task<Uri> task)
-        {
-            if (task.IsFaulted || task.IsCanceled) return;
-
-            UnityWebRequest request = await LoadBundles(task);
-
-            StatusChanged?.Invoke(request.result);
-
-            Debug.Log(request.result == UnityWebRequest.Result.Success
-                ? $"Assets recieved successfully"
-                : $"Error: {request.error}");
-
-            request.Dispose();
-        }
-
-        private async UniTask<UnityWebRequest> LoadBundles(Task<Uri> task)
-        {
-            Debug.Log("Download URL: " + task.Result);
-
-            StatusChanged?.Invoke(UnityWebRequest.Result.InProgress);
-            UnityWebRequest request =
-                UnityWebRequestAssetBundle.GetAssetBundle(task.Result, 0).SendWebRequest().webRequest;
-
-            await UniTask.WaitUntil(() =>
-            {
-                ProgressChanged?.Invoke(request.downloadProgress);
-                return request.isDone == true;
-            });
-
-            AssetBundle bundle = DownloadHandlerAssetBundle.GetContent(request);
-            _staticData.AddAssetBundle(_fileName, bundle);
-
-            return request;
-        }
     }
 }

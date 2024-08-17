@@ -4,11 +4,11 @@ namespace ClickerSystem
 {
     public class Clicker
     {
-        private Wallet _wallet;
+        private Wallet.Wallet _wallet;
         private Button _button;
         private readonly int _addingValue = 1;
 
-        public void Init(Wallet wallet, Button button)
+        public void Init(Wallet.Wallet wallet, Button button)
         {
             _wallet = wallet;
             _button = button;

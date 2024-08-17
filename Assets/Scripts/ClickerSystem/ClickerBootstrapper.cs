@@ -1,5 +1,8 @@
 using System.Collections.Generic;
-using MainMenu_;
+using ClickerSystem.Wallet;
+using Infrastructure;
+using Infrastructure.SaveSystem;
+using MainMenu;
 using ResourceLoaders;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,17 +14,19 @@ namespace ClickerSystem
         [SerializeField] private Canvas _gameplayCanvas;
         [SerializeField] private WalletView _walletView;
         [SerializeField] private Button _pizzaButton;
+        [SerializeField] private ExitToMainMenuButton _exitToMainMenuButton;
         [field: SerializeField] public List<AssetBandleObject> BundleObjectsInfo { get; private set; }
 
+        private readonly OnExitProgressSaver _onExitProgressSaver = new();
         private readonly Clicker _clicker = new();
-        private Wallet _wallet;
+        private Wallet.Wallet _wallet;
         private SaveSystem _saveSystem;
 
-        public override void Init(GameStaticData staticData, GameConfig gameConfig)
+        public override void Init(GameConfig gameConfig, ResourceLoader resourceLoader, string nickname)
         {
-            LoadAssets(staticData, gameConfig);
+            LoadAssets(new GameStaticData(), gameConfig);
             LoadSaves(gameConfig);
-            InitializeObjects();
+            InitializeObjects(gameConfig, resourceLoader);
         }
 
         private void LoadAssets(GameStaticData staticData, GameConfig gameConfig)
@@ -41,18 +46,15 @@ namespace ClickerSystem
             _saveSystem = new SaveSystem(gameConfig.ProgressSavePath);
 
             if (_saveSystem.TryLoad(gameConfig.ProgressSavePath, out _wallet) == false)
-                _wallet = new Wallet();
+                _wallet = new Wallet.Wallet();
         }
 
-        private void InitializeObjects()
+        private void InitializeObjects(GameConfig gameConfig, ResourceLoader resourceLoader)
         {
             _walletView.Init(_wallet);
             _clicker.Init(_wallet, _pizzaButton);
-        }
-
-        private void OnApplicationQuit()
-        {
-            _saveSystem.Save(_wallet);
+            _onExitProgressSaver.Init(_wallet, _saveSystem, resourceLoader, gameConfig);
+            _exitToMainMenuButton.Init(_onExitProgressSaver);
         }
     }
 }

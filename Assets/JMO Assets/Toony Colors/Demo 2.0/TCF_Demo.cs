@@ -1,11 +1,11 @@
 ﻿// Toony Colors Free
 // (c) 2012,2015 Jean Moreno
 
-using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
-namespace ToonyColors
+namespace JMO_Assets.Toony_Colors.Demo_2._0
 {
 	public class TCF_Demo : MonoBehaviour
 	{

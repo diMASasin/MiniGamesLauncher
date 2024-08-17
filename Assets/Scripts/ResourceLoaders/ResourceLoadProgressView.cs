@@ -11,41 +11,59 @@ namespace ResourceLoaders
         [SerializeField] private Slider _slider;
         [SerializeField] private TMP_Text _statusText;
         
-        private IResourceLoader _resourceLoader;
+        private ILoadMethodActions[] _loadMethods;
         private float _maxProgressValue;
+        private int _loadedResources;
 
-        public void Init(IResourceLoader resourceLoader)
+        public void Init(params ILoadMethodActions[] resourceLoader)
         {
-            _resourceLoader = resourceLoader;
+            _loadMethods = resourceLoader;
             _maxProgressValue = _slider.maxValue;
-            
-            _resourceLoader.ProgressChanged += OnProgressChanged;
-            _resourceLoader.StatusChanged += OnStatusChanged;
-            _resourceLoader.Unloaded += OnUnloaded;
+
+            foreach (var loader in _loadMethods)
+            {
+                loader.ProgressChanged += OnProgressChangedMax;
+                loader.StatusChanged += OnStatusChanged;
+                loader.Unloaded += OnUnloaded;
+            }
         }
 
         private void OnDestroy()
         {
-            _resourceLoader.ProgressChanged -= OnProgressChanged;
-            _resourceLoader.StatusChanged -= OnStatusChanged;
-            _resourceLoader.Unloaded -= OnUnloaded;
-        }
-
-        private void OnProgressChanged(float progress)
-        {
-            _slider.value = progress;
-        }
-
-        private void OnStatusChanged(UnityWebRequest.Result result)
-        {
-            _statusText.text = result.ToString();
+            foreach (var loader in _loadMethods)
+            {
+                loader.ProgressChanged -= OnProgressChangedMax;
+                loader.StatusChanged -= OnStatusChanged;
+                loader.Unloaded -= OnUnloaded;
+            }
         }
 
         public void OnLoaded()
         {
             OnProgressChanged(_maxProgressValue);
-            OnStatusChanged(UnityWebRequest.Result.Success);
+            ShowStatus(UnityWebRequest.Result.Success);
         }
+
+        private void OnProgressChanged(float progress) => 
+            _slider.value = progress;
+        
+        private void OnProgressChangedMax(float progress) => 
+            OnProgressChanged(Mathf.Max(progress, _slider.value));
+
+        private void OnStatusChanged(UnityWebRequest.Result result)
+        {
+            if (result == UnityWebRequest.Result.Success)
+            {
+                _loadedResources++;
+
+                if (_loadedResources < _loadMethods.Length)
+                    return;
+            }
+
+            ShowStatus(result);
+        }
+
+        private void ShowStatus(UnityWebRequest.Result result) => _statusText.text = result.ToString();
 
         private void OnUnloaded()
         {
