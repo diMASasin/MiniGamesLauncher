@@ -31,7 +31,6 @@ namespace Infrastructure.SaveSystem
         {
             Save();
             await _resourceLoader.Upload(_gameConfig.ProgressSavePath);
-            _resourceLoader.Unload(_gameConfig.ProgressSavePath);
         }      
     }
 }

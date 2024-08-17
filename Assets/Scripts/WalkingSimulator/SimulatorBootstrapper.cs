@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Infrastructure;
 using Infrastructure.SaveSystem;
 using MainMenu;
+using OpenCover.Framework.Model;
 using ResourceLoaders;
 using UnityEngine;
 using WalkingSimulator.Character;
@@ -9,6 +10,7 @@ using WalkingSimulator.Level;
 using WalkingSimulator.Timers;
 using WalkingSimulator.UI;
 using WalkingSimulator.UI.Leaderboard;
+using File = System.IO.File;
 
 namespace WalkingSimulator
 {
@@ -62,8 +64,8 @@ namespace WalkingSimulator
         private void LoadSaves(GameConfig config)
         {
             _saveSystem = new SaveSystem(config.ProgressSavePath);
-
-            if (_saveSystem.TryLoad(config.ProgressSavePath, out _leaderboard) == false)
+            
+            if (File.Exists(config.ProgressSavePath) && _saveSystem.TryLoad(config.ProgressSavePath, out _leaderboard) == false)
                 _leaderboard = new Leaderboard();
         }
 
