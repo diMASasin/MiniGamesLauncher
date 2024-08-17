@@ -1,0 +1,38 @@
+ManifestFileVersion: 0
+CRC: 301586336
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: c423a91bfba98a06e9e7a10a1a9a3e76
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 6cf66b613769ec69c36c2a330f6c4710
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: c423a91bfba98a06e9e7a10a1a9a3e76
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 86710e43de46f6f4bac7c8e50813a599, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
+- Class: 222
+  Script: {instanceID: 0}
+- Class: 224
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers:
+- AssemblyName: UnityEngine.CoreModule
+  ClassName: UnityEngine.Events.PersistentCallGroup
+- AssemblyName: UnityEngine.UI
+  ClassName: UnityEngine.UI.MaskableGraphic/CullStateChangedEvent
+Assets:
+- Assets/Prefabs/PizzaImage.prefab
+Dependencies: []
