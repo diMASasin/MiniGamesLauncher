@@ -1,4 +1,3 @@
-using ClickerSystem;
 using ResourceLoaders;
 using UnityEngine;
 using UnityEngine.SceneManagement;

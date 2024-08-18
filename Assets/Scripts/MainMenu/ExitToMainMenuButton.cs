@@ -1,4 +1,3 @@
-using Infrastructure;
 using Infrastructure.SaveSystem;
 using Infrastructure.SceneLoader;
 using UnityEngine;

@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using Infrastructure;
 using Infrastructure.SaveSystem;
 using MainMenu;
-using OpenCover.Framework.Model;
 using ResourceLoaders;
 using UnityEngine;
 using WalkingSimulator.Character;
@@ -65,7 +64,7 @@ namespace WalkingSimulator
         {
             _saveSystem = new SaveSystem(config.ProgressSavePath);
             
-            if (File.Exists(config.ProgressSavePath) && _saveSystem.TryLoad(config.ProgressSavePath, out _leaderboard) == false)
+            if (File.Exists(config.ProgressSavePath) == false || _saveSystem.TryLoad(config.ProgressSavePath, out _leaderboard) == false)
                 _leaderboard = new Leaderboard();
         }
 

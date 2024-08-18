@@ -46,7 +46,7 @@ namespace MainMenu
             _assetBundlesLoadMethod = new AssetBundlesLoadMethod(_gameStaticData);
             _fileLoadMethod = new FileLoader();
 
-            _progressView.Init(_fileResourceLoader);
+            _progressView.Init(_bundleResourceLoader, _fileResourceLoader);
         }
 
         private void OnEnable()

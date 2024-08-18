@@ -1,4 +1,3 @@
-using ResourceLoaders;
 using UnityEngine;
 
 namespace Infrastructure

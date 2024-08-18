@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using ClickerSystem.Wallet;
 using Infrastructure;
 using Infrastructure.SaveSystem;
@@ -45,7 +46,7 @@ namespace ClickerSystem
         {
             _saveSystem = new SaveSystem(gameConfig.ProgressSavePath);
 
-            if (_saveSystem.TryLoad(gameConfig.ProgressSavePath, out _wallet) == false)
+            if (File.Exists(gameConfig.ProgressSavePath) == false || _saveSystem.TryLoad(gameConfig.ProgressSavePath, out _wallet) == false)
                 _wallet = new Wallet.Wallet();
         }
 
